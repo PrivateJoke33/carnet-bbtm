@@ -250,6 +250,78 @@
   .tools{
     display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 22px;
   }
+
+  /* ---------- CELLULES À LISTE ---------- */
+  td.pk{
+    cursor:pointer;position:relative;padding-right:26px;
+    background:rgba(255,255,255,.42);box-shadow:inset 0 -1px 0 #B3A377;
+    -webkit-user-select:none;user-select:none;
+  }
+  td.pk:hover{background:rgba(255,255,255,.78)}
+  td.pk::after{
+    content:"";position:absolute;right:9px;top:50%;width:5px;height:5px;
+    border-right:2px solid #8B7C56;border-bottom:2px solid #8B7C56;
+    transform:translateY(-72%) rotate(45deg);pointer-events:none;
+  }
+  td.pk:empty::before{content:"···";color:#A2916A;letter-spacing:.1em}
+  td.pk.calc{
+    background:rgba(29,58,40,.1);font-variant-numeric:tabular-nums;
+    box-shadow:inset 0 -1px 0 #A8996F;
+  }
+  td.pk.calc::after{border-color:var(--turf)}
+  td.pk.locked::after{
+    border:none;border-radius:50%;width:6px;height:6px;
+    background:var(--blood);transform:translateY(-50%);
+  }
+
+  .pop-back{position:fixed;inset:0;background:rgba(8,12,10,.45);z-index:60}
+  .pop{
+    position:fixed;z-index:61;width:290px;max-width:calc(100vw - 24px);
+    background:#F2EBD9;color:var(--ink);
+    border:1px solid #8B7C56;box-shadow:0 20px 46px rgba(0,0,0,.5);
+    display:flex;flex-direction:column;max-height:min(64vh,460px);
+  }
+  .pop-head{display:flex;align-items:center;gap:6px;padding:9px;border-bottom:1px solid #C3B48C;background:#E6DECA}
+  .pop-q{
+    flex:1;min-width:0;font-family:var(--body);font-size:16px;
+    padding:8px 9px;border:1px solid #A8996F;background:#fff;color:var(--ink);border-radius:2px;
+  }
+  .pop-q:focus{outline:2px solid var(--blood);outline-offset:-1px}
+  .pop-x{
+    flex:0 0 auto;width:34px;height:34px;border:1px solid #A8996F;background:#F2EBD9;
+    color:var(--ink);cursor:pointer;font-size:15px;line-height:1;border-radius:2px;
+  }
+  .pop-x:hover{background:var(--ink);color:var(--bone)}
+  .pop-list{overflow-y:auto;overscroll-behavior:contain;padding:4px 0}
+  .pop-grp{
+    font-family:var(--util);text-transform:uppercase;letter-spacing:.16em;
+    font-size:10px;color:var(--ink-soft);padding:9px 12px 3px;
+  }
+  .pop-opt{
+    display:block;width:100%;text-align:left;border:none;background:none;
+    font-family:var(--body);font-size:15.5px;color:var(--ink);
+    padding:9px 12px;cursor:pointer;min-height:40px;
+  }
+  .pop-opt:hover,.pop-opt:focus{background:var(--blood);color:#fff;outline:none}
+  .pop-opt.on{font-weight:600;box-shadow:inset 3px 0 0 var(--blood)}
+  .pop-opt.free{font-style:italic;color:var(--blood)}
+  .pop-opt.free:hover{color:#fff}
+  .pop-none{padding:12px;color:var(--ink-soft);font-style:italic;font-size:14.5px}
+
+  @media (max-width:640px){
+    .pop{
+      left:0 !important;right:0;bottom:0;top:auto !important;
+      width:100%;max-width:100%;max-height:72vh;border-left:none;border-right:none;
+      border-bottom:none;border-top:4px solid var(--blood);
+    }
+    .pop-opt{font-size:16px;padding:11px 14px;min-height:44px}
+  }
+
+  @media print{
+    td.pk{background:none;box-shadow:inset 0 -1px 0 #999}
+    td.pk::after,td.pk:empty::before{display:none}
+    .pop,.pop-back{display:none !important}
+  }
   .btn{
     font-family:var(--util);text-transform:uppercase;letter-spacing:.12em;
     font-size:11px;font-weight:500;
@@ -1699,6 +1771,7 @@
     var fallback = el.hasAttribute("contenteditable") ? "" : el.textContent.trim();
     el.setAttribute("contenteditable", "true");
     el.dataset.key = key;
+    if(document.activeElement === el) return;   /* ne jamais casser le curseur en cours de frappe */
     el.textContent = (state[key] !== undefined && state[key] !== null)
       ? state[key]
       : fallback;
@@ -1740,6 +1813,8 @@
     panel.querySelectorAll(".edit-line, .edit-block").forEach(function(el){
       makeEditable(el, prefix + panel.id + "|" + el.dataset.k);
     });
+
+    applyPicks(panel);
   }
 
   function addRowButtons(){
@@ -2129,7 +2204,266 @@
     }
   }
 
-  function renderAll(){ renderDigest(); renderAuto(); }
+
+  /* =====================================================================
+     CELLULES À LISTE
+     La cellule reste une cellule de texte : le format de sauvegarde est
+     inchangé, l'impression aussi. Seule la saisie passe par une liste.
+     ===================================================================== */
+
+  var TEAMS = [
+    ["OWA · Old World Association", ["Reikland Reavers", "Athelorn Avengers", "Grudgebearers"]],
+    ["CWC · Chaos Wastes Confederation", ["Gouged Eye", "Chaos All-Stars", "Skavenblight Scramblers"]],
+    ["DSS · Dark Sorcery Syndicate", ["Champions of Death", "Black Fangs", "Naggaroth Nightmares"]],
+    ["PPG · Putrid Players' Guild", ["Nurgle's Rotters", "The Lowdown Rats", "The Zharr-Naggrund Ziggurats"]],
+    ["CABAL · Cabal Vision", ["Elfheim Eagles", "Norsca Rampagers", "Praag Changelings"]],
+    ["WOA · World Outsiders Association", ["Mongrel Horde", "Oldheim Ogres", "Khorne's Killers"]],
+    ["ALL · Ancient Legendary League", ["Amazon All-Stars", "Sotek's Word", "Lustria Croakers"]],
+    ["AFI · Albion Football Institution", ["Galadrieth Gladiators", "Bright Crusaders", "Greenfield Grasshuggers"]],
+    ["TCD · Tomb Crushers Division", ["Neter-Khertet", "Underworld Creepers", "Bruendar Grimjacks"]],
+    ["FFS · Foul Fiends Syndicate", ["The Midden Moors Marauders", "Drakwald Beasts", "Frozen Phantoms"]],
+    ["NAF · Nuffle Amorical Football", ["Orcland Raiders", "Evil Gitz", "Bögenhafen Barons"]]
+  ];
+
+  var LISTS = {
+    leagues:  [["", ["OWA", "CWC", "DSS", "PPG", "CABAL", "WOA", "ALL", "AFI", "TCD", "FFS", "NAF"]]],
+    circuits: [["Prestige croissant", ["Challenger Circuit", "Super 7", "Tournaments of Champions", "Majors"]]],
+    rank:     [["", ["1", "2", "3", "4", "5"]]],
+    yesno:    [["Logo de l'équipe du manager", ["Oui", "Non"]]],
+    week:     [["", ["1", "2", "3", "4", "5"]]],
+    season:   [["", ["1", "2", "3", "4", "5", "6"]]],
+    cycle:    [["", ["I", "II", "III", "IV", "V", "VI"]]],
+    options:  [["Rotation RM6", ["Aucune", "Stades", "Arbitre Corrompu + Balles enchantées", "Les trois"]]]
+  };
+
+  /* colonnes câblées, par identifiant de tableau */
+  var PICKS = {
+    "p4#t0": {0:"managers", 1:"teams"},
+    "p8#t0": {1:"managers", 2:"teams"},
+    "p8#t1": {0:"cycle", 1:"season", 3:"circuits", 4:"managers", 5:"teams"},
+    "p8#t2": {0:"season", 1:"managers", 2:"teams"},
+    "p3#t0": {2:"options", 4:"managers"},
+    "p9#t0": {0:"season"},
+    "p5#t0": {0:"managers", 1:"teams", 4:"rank", 5:"points"},
+    "p5#t1": {0:"managers", 2:"leagues", 3:"yesno"},
+    "p5#t2": {0:"week", 2:"circuits", 3:"managers"},
+    "p7#t0": {1:"leagues", 2:"managers", 3:"managers"},
+    "p7#t1": {0:"managers", 1:"teams", 3:"season"},
+    "p6#t0": {0:"managers", 1:"teams", 2:"leagues"},
+    "p6#t1": {0:"teams", 1:"cycle", 2:"managers"}
+  };
+
+  /* la liste des managers se construit toute seule */
+  function managerNames(){
+    var seen = {}, out = [];
+    function add(v){
+      v = String(v || "").trim();
+      if(!v) return;
+      var k = norm(v);
+      if(!k || seen[k]) return;
+      seen[k] = 1; out.push(v);
+    }
+    var r, sn;
+    for(r = 0; r < 40; r++){
+      add(state["p4#t0|" + r + "|0"]);
+      add(state["p6#t0|" + r + "|0"]);
+      for(sn = 1; sn <= 6; sn++) add(state["S" + sn + "|p5#t0|" + r + "|0"]);
+    }
+    out.sort(function(a, b){ return a.localeCompare(b); });
+    return [["Managers déjà saisis", out]];
+  }
+
+  function groupsFor(name, key){
+    if(name === "managers") return managerNames();
+    if(name === "teams") return TEAMS;
+    if(name === "points") return pointsGroups(key);
+    return LISTS[name] || [];
+  }
+
+  function applyPicks(panel){
+    panel.querySelectorAll("table.fillable").forEach(function(table){
+      var map = PICKS[tableId(panel, table)];
+      if(!map) return;
+      var body = table.tBodies[0];
+      if(!body) return;
+      Array.prototype.forEach.call(body.rows, function(row){
+        Array.prototype.forEach.call(row.cells, function(cell, c){
+          if(cell.dataset.fixed === "1" || map[c] === undefined) return;
+          cell.setAttribute("contenteditable", "false");
+          cell.classList.add("pk");
+          cell.dataset.pick = map[c];
+          if(map[c] === "points"){
+            cell.classList.add("calc");
+            cell.classList.toggle("locked", !!state["lock|" + cell.dataset.key]);
+          }
+        });
+      });
+    });
+  }
+
+  /* ---------- barème RM1 et calcul des points ---------- */
+  function baremeRM1(effectif, rang){
+    if(!rang || rang < 1 || effectif < 2) return null;
+    if(effectif === 2) return rang === 1 ? 3 : (rang === 2 ? 1 : 0);
+    if(effectif <= 4) return rang === 1 ? 4 : (rang === 2 ? 2 : 1);
+    return rang === 1 ? 5 : (rang === 2 ? 2 : 1);
+  }
+
+  function pointsGroups(key){
+    var m = /^S(\d)\|p5#t0\|(\d+)\|5$/.exec(key || "");
+    var auto = null;
+    if(m){
+      var pre = "S" + m[1] + "|p5#t0|", r = m[2], eff = 0, i;
+      for(i = 0; i < 40; i++){ if((state[pre + i + "|0"] || "").trim()) eff++; }
+      auto = baremeRM1(eff, num(state[pre + r + "|4"]));
+    }
+    return [
+      ["Barème RM1", ["Automatique" + (auto === null ? " (rang manquant)" : " (" + auto + ")")]],
+      ["Forcer une valeur", ["0", "1", "2", "3", "4", "5", "6"]]
+    ];
+  }
+
+  function recomputePoints(){
+    var changed = false, sn, r, i;
+    for(sn = 1; sn <= 6; sn++){
+      var pre = "S" + sn + "|p5#t0|", eff = 0;
+      for(i = 0; i < 40; i++){ if((state[pre + i + "|0"] || "").trim()) eff++; }
+      for(r = 0; r < 40; r++){
+        var k = pre + r + "|5";
+        if(state["lock|" + k]) continue;
+        var nm = (state[pre + r + "|0"] || "").trim();
+        var v = nm ? baremeRM1(eff, num(state[pre + r + "|4"])) : null;
+        var nv = (v === null) ? "" : String(v);
+        if((state[k] || "") !== nv){
+          if(nv === "") delete state[k]; else state[k] = nv;
+          changed = true;
+        }
+      }
+    }
+    return changed;
+  }
+
+  /* ---------- le sélecteur ---------- */
+  var pop = null, popBack = null, popCell = null, popGroups = null;
+
+  function buildPop(){
+    popBack = document.createElement("div");
+    popBack.className = "pop-back";
+    popBack.hidden = true;
+    popBack.addEventListener("click", closePop);
+
+    pop = document.createElement("div");
+    pop.className = "pop";
+    pop.hidden = true;
+    pop.setAttribute("role", "dialog");
+    pop.innerHTML = '<div class="pop-head">'
+      + '<input class="pop-q" type="text" autocomplete="off" spellcheck="false" placeholder="Chercher ou saisir…">'
+      + '<button class="pop-x" type="button" aria-label="Fermer">✕</button></div>'
+      + '<div class="pop-list"></div>';
+    pop.querySelector(".pop-x").addEventListener("click", closePop);
+    pop.querySelector(".pop-q").addEventListener("input", function(){ paintPop(this.value); });
+    pop.querySelector(".pop-q").addEventListener("keydown", function(e){
+      if(e.key === "Enter"){ e.preventDefault(); choose(this.value.trim()); }
+      if(e.key === "Escape"){ e.preventDefault(); closePop(); }
+    });
+    document.body.appendChild(popBack);
+    document.body.appendChild(pop);
+  }
+
+  function openPop(td){
+    if(!pop) buildPop();
+    popCell = td;
+    popGroups = groupsFor(td.dataset.pick, td.dataset.key);
+    var q = pop.querySelector(".pop-q");
+    q.value = "";
+    q.placeholder = (td.dataset.pick === "points") ? "Ou saisir une valeur…" : "Chercher ou saisir…";
+    popBack.hidden = false;
+    pop.hidden = false;
+    paintPop("");
+    placePop(td);
+    if(window.innerWidth > 640) q.focus();
+  }
+
+  function placePop(td){
+    if(window.innerWidth <= 640) return;
+    var r = td.getBoundingClientRect();
+    var w = pop.offsetWidth, h = pop.offsetHeight;
+    var left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
+    var top = (r.bottom + h + 8 < window.innerHeight) ? r.bottom + 4 : Math.max(8, r.top - h - 4);
+    pop.style.left = left + "px";
+    pop.style.top = top + "px";
+  }
+
+  function closePop(){
+    if(!pop) return;
+    pop.hidden = true;
+    popBack.hidden = true;
+    popCell = null;
+  }
+
+  function paintPop(q){
+    var cur = popCell ? (state[popCell.dataset.key] || "").trim() : "";
+    var nq = norm(q), h = "", hits = 0;
+    popGroups.forEach(function(g){
+      var opts = g[1].filter(function(o){ return !nq || norm(o).indexOf(nq) >= 0; });
+      if(!opts.length) return;
+      hits += opts.length;
+      if(g[0]) h += '<div class="pop-grp">' + esc(g[0]) + "</div>";
+      opts.forEach(function(o){
+        h += '<button type="button" class="pop-opt' + (o === cur ? " on" : "") + '" data-v="'
+          + esc(o) + '">' + esc(o) + "</button>";
+      });
+    });
+    if(q.trim()){
+      h = '<button type="button" class="pop-opt free" data-v="' + esc(q.trim()) + '">Saisir « '
+        + esc(q.trim()) + " »</button>" + h;
+    } else if(cur){
+      h = '<button type="button" class="pop-opt free" data-v="">Vider la case</button>' + h;
+    }
+    if(!hits && !q.trim()) h += '<div class="pop-none">Aucune valeur disponible pour le moment.</div>';
+    pop.querySelector(".pop-list").innerHTML = h;
+  }
+
+  function choose(v){
+    if(!popCell) return;
+    var key = popCell.dataset.key, kind = popCell.dataset.pick;
+    var panel = popCell.closest(".panel");
+    if(kind === "points"){
+      if(/^Automatique/.test(v)){ delete state["lock|" + key]; }
+      else if(v === ""){ delete state["lock|" + key]; delete state[key]; }
+      else { state["lock|" + key] = "1"; state[key] = v; }
+    } else {
+      if(v === "") delete state[key]; else state[key] = v;
+    }
+    closePop();
+    if(panel) hydratePanel(panel);
+    queueSave();
+    renderAll();
+    if(panel) hydratePanel(panel);
+  }
+
+  document.addEventListener("click", function(e){
+    var opt = e.target.closest && e.target.closest(".pop-opt");
+    if(opt){ choose(opt.dataset.v); return; }
+    var td = e.target.closest && e.target.closest("td.pk");
+    if(td && td.dataset.key){ e.preventDefault(); openPop(td); }
+  });
+
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && pop && !pop.hidden) closePop();
+  });
+
+  window.addEventListener("resize", function(){ if(popCell) placePop(popCell); });
+
+  function renderAll(){
+    if(recomputePoints()){
+      var p5 = document.getElementById("p5");
+      if(p5) hydratePanel(p5);
+      queueSave();
+    }
+    renderDigest();
+    renderAuto();
+  }
 
   /* ---------- report manuel vers le tableau du classement ---------- */
   function copyLedger(){
