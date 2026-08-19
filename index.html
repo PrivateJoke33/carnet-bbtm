@@ -28,6 +28,11 @@
     --util:"Oswald", "Arial Narrow", Impact, sans-serif;
     --body:"Spectral", Georgia, "Times New Roman", serif;
   }
+  /* Une declaration d'auteur l'emporte toujours sur la feuille user-agent :
+     tout element portant `display` dans ce fichier ignorerait `[hidden]`.
+     Cette garde retablit le comportement attendu une fois pour toutes. */
+  [hidden]{display:none !important}
+
   *{box-sizing:border-box}
   html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
   body{
@@ -252,6 +257,7 @@
   }
 
   /* ---------- CELLULES À LISTE ---------- */
+  td.pk:focus-visible{outline:2px solid var(--blood);outline-offset:-2px}
   td.pk{
     cursor:pointer;position:relative;padding-right:26px;
     background:rgba(255,255,255,.42);box-shadow:inset 0 -1px 0 #B3A377;
@@ -275,6 +281,7 @@
   }
 
   .pop-back{position:fixed;inset:0;background:rgba(8,12,10,.45);z-index:60}
+  .pop[hidden],.pop-back[hidden]{display:none}
   .pop{
     position:fixed;z-index:61;width:290px;max-width:calc(100vw - 24px);
     background:#F2EBD9;color:var(--ink);
@@ -308,6 +315,7 @@
   .pop-opt.free:hover{color:#fff}
   .pop-none{padding:12px;color:var(--ink-soft);font-style:italic;font-size:14.5px}
 
+  body.pop-open{overflow:hidden}
   @media (max-width:640px){
     .pop{
       left:0 !important;right:0;bottom:0;top:auto !important;
@@ -2291,6 +2299,8 @@
           if(cell.dataset.fixed === "1" || map[c] === undefined) return;
           cell.setAttribute("contenteditable", "false");
           cell.classList.add("pk");
+          cell.setAttribute("tabindex", "0");
+          cell.setAttribute("role", "button");
           cell.dataset.pick = map[c];
           if(map[c] === "points"){
             cell.classList.add("calc");
@@ -2350,21 +2360,23 @@
     popBack = document.createElement("div");
     popBack.className = "pop-back";
     popBack.hidden = true;
-    popBack.addEventListener("click", closePop);
+    popBack.addEventListener("click", function(){ closePop(true); });
 
     pop = document.createElement("div");
     pop.className = "pop";
     pop.hidden = true;
     pop.setAttribute("role", "dialog");
+    pop.setAttribute("aria-modal", "true");
+    pop.setAttribute("aria-label", "Choisir une valeur");
     pop.innerHTML = '<div class="pop-head">'
       + '<input class="pop-q" type="text" autocomplete="off" spellcheck="false" placeholder="Chercher ou saisir…">'
       + '<button class="pop-x" type="button" aria-label="Fermer">✕</button></div>'
       + '<div class="pop-list"></div>';
-    pop.querySelector(".pop-x").addEventListener("click", closePop);
+    pop.querySelector(".pop-x").addEventListener("click", function(){ closePop(true); });
     pop.querySelector(".pop-q").addEventListener("input", function(){ paintPop(this.value); });
     pop.querySelector(".pop-q").addEventListener("keydown", function(e){
       if(e.key === "Enter"){ e.preventDefault(); choose(this.value.trim()); }
-      if(e.key === "Escape"){ e.preventDefault(); closePop(); }
+      if(e.key === "Escape"){ e.preventDefault(); closePop(true); }
     });
     document.body.appendChild(popBack);
     document.body.appendChild(pop);
@@ -2372,7 +2384,9 @@
 
   function openPop(td){
     if(!pop) buildPop();
+    if(popCell === td && !pop.hidden){ closePop(true); return; }  /* second clic = fermeture */
     popCell = td;
+    document.body.classList.add("pop-open");
     popGroups = groupsFor(td.dataset.pick, td.dataset.key);
     var q = pop.querySelector(".pop-q");
     q.value = "";
@@ -2394,11 +2408,17 @@
     pop.style.top = top + "px";
   }
 
-  function closePop(){
+  function closePop(giveFocusBack){
     if(!pop) return;
+    var back = popCell;
     pop.hidden = true;
     popBack.hidden = true;
     popCell = null;
+    document.body.classList.remove("pop-open");
+    /* rendre le focus a la cellule : sans ca, la tabulation repart du debut du document */
+    if(giveFocusBack === true && back && document.contains(back)){
+      try{ back.focus({preventScroll:true}); }catch(e){ back.focus(); }
+    }
   }
 
   function paintPop(q){
@@ -2435,25 +2455,57 @@
     } else {
       if(v === "") delete state[key]; else state[key] = v;
     }
-    closePop();
+    closePop(false);
     if(panel) hydratePanel(panel);
     queueSave();
     renderAll();
     if(panel) hydratePanel(panel);
+    /* hydratePanel a reconstruit les cellules : on refocalise par la cle, pas par la reference */
+    var again = document.querySelector('td.pk[data-key="' + (window.CSS && CSS.escape ? CSS.escape(key) : key) + '"]');
+    if(again){ try{ again.focus({preventScroll:true}); }catch(e){} }
+  }
+
+  /* e.target peut etre un noeud sans closest (texte, element SVG ancien) :
+     on remonte au premier Element avant d'interroger le DOM. */
+  function elementOf(node){
+    while(node && node.nodeType !== 1) node = node.parentNode;
+    return (node && node.closest) ? node : null;
   }
 
   document.addEventListener("click", function(e){
-    var opt = e.target.closest && e.target.closest(".pop-opt");
-    if(opt){ choose(opt.dataset.v); return; }
-    var td = e.target.closest && e.target.closest("td.pk");
+    var el = elementOf(e.target);
+    if(!el) return;
+    var opt = el.closest(".pop-opt");
+    if(opt){ e.preventDefault(); choose(opt.dataset.v); return; }
+    if(el.closest(".pop")) return;                 /* clic dans le panneau : ne rien declencher */
+    var td = el.closest("td.pk");
     if(td && td.dataset.key){ e.preventDefault(); openPop(td); }
   });
 
+  /* Entree ou Espace sur une cellule ouvre la liste, comme un vrai bouton. */
   document.addEventListener("keydown", function(e){
-    if(e.key === "Escape" && pop && !pop.hidden) closePop();
+    if(e.key !== "Enter" && e.key !== " " && e.key !== "Spacebar") return;
+    var el = elementOf(e.target);
+    if(!el) return;
+    var td = el.closest("td.pk");
+    if(td && td.dataset.key && (!pop || pop.hidden)){ e.preventDefault(); openPop(td); }
+  });
+
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && pop && !pop.hidden){ e.preventDefault(); closePop(true); }
   });
 
   window.addEventListener("resize", function(){ if(popCell) placePop(popCell); });
+
+  /* En position fixed, le panneau resterait sur place pendant que la cellule
+     defile. On le recale, et on ferme s'il sort du champ. */
+  window.addEventListener("scroll", function(){
+    if(!popCell || !pop || pop.hidden) return;
+    if(window.innerWidth <= 640) return;
+    var r = popCell.getBoundingClientRect();
+    if(r.bottom < 0 || r.top > window.innerHeight){ closePop(false); return; }
+    placePop(popCell);
+  }, true);
 
   function renderAll(){
     if(recomputePoints()){
