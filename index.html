@@ -270,6 +270,14 @@
     transform:translateY(-72%) rotate(45deg);pointer-events:none;
   }
   td.pk:empty::before{content:"···";color:#A2916A;letter-spacing:.1em}
+  /* cellule remplie depuis une feuille de saison */
+  td.af, .edit-line.af{
+    box-shadow:inset 3px 0 0 var(--turf), inset 0 -1px 0 #B3A377;
+    background:rgba(47,96,68,.07);
+  }
+  td.af.pk{background:rgba(47,96,68,.1)}
+  @media print{ td.af{box-shadow:inset 0 -1px 0 #999;background:none} }
+
   td.pk.calc{
     background:rgba(29,58,40,.1);font-variant-numeric:tabular-nums;
     box-shadow:inset 0 -1px 0 #A8996F;
@@ -772,12 +780,9 @@
         <button class="tab" role="tab" aria-selected="false" aria-controls="p8" data-target="p8"><span class="num">04</span> Palmarès</button>
         <button class="tab" role="tab" aria-selected="false" aria-controls="p3" data-target="p3"><span class="num">05</span> Calendrier</button>
         <button class="tab" role="tab" aria-selected="false" aria-controls="p5" data-target="p5"><span class="num">06</span> Feuille de saison</button>
-        <button class="tab" role="tab" aria-selected="false" aria-controls="p7" data-target="p7"><span class="num">07</span> Transferts</button>
-        <button class="tab" role="tab" aria-selected="false" aria-controls="p6" data-target="p6"><span class="num">08</span> Rosters</button>
-        <button class="tab" role="tab" aria-selected="false" aria-controls="p11" data-target="p11"><span class="num">09</span> Legendary Ed.</button>
-        <button class="tab" role="tab" aria-selected="false" aria-controls="p2" data-target="p2"><span class="num">10</span> Règles maison</button>
-        <button class="tab" role="tab" aria-selected="false" aria-controls="p1" data-target="p1"><span class="num">11</span> Réglages</button>
-        <button class="tab" role="tab" aria-selected="false" aria-controls="p10" data-target="p10"><span class="num">12</span> En suspens</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p6" data-target="p6"><span class="num">07</span> Rosters</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p2" data-target="p2"><span class="num">08</span> Règles maison</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p1" data-target="p1"><span class="num">09</span> Réglages</button>
       </nav>
     </div>
   </header>
@@ -814,7 +819,7 @@
         <div class="tools">
           <button class="btn" type="button" data-goto="p9">Spike! Magazine</button>
           <button class="btn" type="button" data-goto="p5">Saisir une soirée</button>
-          <button class="btn" type="button" data-goto="p7">Marché des transferts</button>
+          <button class="btn" type="button" data-goto="p6">Rosters et marché</button>
           <button class="btn" type="button" data-goto="p2">Règles maison</button>
         </div>
       </div>
@@ -918,7 +923,7 @@
     <section class="panel" id="p4" role="tabpanel">
       <div class="sheet">
         <h2>Classement de Cycle</h2>
-        <p class="kicker">Trois meilleures saisons sur quatre · colonne Maj. remplie en fin de Cycle seulement</p>
+        <p class="kicker">Rempli depuis les feuilles de saison <span class="badge b-auto">Calculé</span></p>
         <div class="t-scroll">
           <table class="fillable">
             <caption>S1 à S4 : points de ligue RM1. Barrer le plus mauvais une fois les 4 saisons jouées. Maj. : points de major des trois saisons retenues, crédités seulement si le manager n'est pas 1er provisoire — voir RM7.</caption>
@@ -933,12 +938,9 @@
           </table>
         </div>
         <div class="note"><span class="lab">Ordre de calcul en fin de Cycle <span class="badge b-maison">Maison</span></span>1. Additionner les 3 meilleures saisons RM1. 2. Repérer le 1er provisoire — il n'aura aucun point de major. 3. Créditer les points de major de tous les autres, dans la colonne Maj. 4. Établir le classement final. Le 1er provisoire n'est pas recalculé : s'il est dépassé, il est dépassé.</div>
-        <h3>Report automatique des feuilles de saison <span class="badge b-auto">Calculé</span></h3>
-        <p>Recalculé à chaque frappe dans la Feuille de saison. Les trois meilleures saisons sont retenues, la ou les autres barrées. Les points de major sont projetés selon RM7 : le 1er provisoire n'en reçoit aucun.</p>
+        <h3>Détail du calcul <span class="badge b-auto">Calculé</span></h3>
+        <p>Saisons écartées barrées, points de major projetés selon RM7.</p>
         <div id="dgLedger"></div>
-        <div class="tools">
-          <button class="btn" id="copyLedger" type="button">Recopier dans le tableau ci-dessus</button>
-        </div>
 
         <h3>Départage</h3>
         <ul>
@@ -953,7 +955,7 @@
     <section class="panel" id="p8" role="tabpanel">
       <div class="sheet">
         <h2>Palmarès permanent</h2>
-        <p class="kicker">Ce que le Cycle ne remet pas à zéro</p>
+        <p class="kicker">Ce que le Cycle ne remet pas à zéro · champion et titres calculés <span class="badge b-auto">Calculé</span></p>
         <div class="t-scroll">
           <table class="fillable">
             <thead><tr><th class="num">Cycle</th><th>Champion</th><th>Équipe</th><th class="num">Total</th><th>Fait d'armes</th></tr></thead>
@@ -966,8 +968,8 @@
           </table>
         </div>
 
-        <h3>Registre des titres de Tournoi <span class="badge b-maison">Maison</span></h3>
-        <p>Une ligne par Tournoi remporté, quel que soit son circuit. Le circuit ne change pas la valeur du titre : il fixe la place de la carte dans le deck <em>Spike!</em> — voir RM7.</p>
+        <h3>Registre des titres de Tournoi <span class="badge b-maison">Maison</span> <span class="badge b-auto">Calculé</span></h3>
+        <p>Une ligne par Tournoi remporté, relevée sur les feuilles de saison. Le circuit ne change pas la valeur du titre : il fixe la place de la carte dans le deck <em>Spike!</em> — voir RM7.</p>
         <div class="t-scroll">
           <table class="fillable">
             <thead><tr><th class="num">Cycle</th><th class="num">Saison</th><th>Tournoi</th><th>Circuit</th><th>Vainqueur</th><th>Équipe</th></tr></thead>
@@ -984,12 +986,8 @@
           </table>
         </div>
 
-        <h3>Titres relevés sur les feuilles de saison <span class="badge b-auto">Calculé</span></h3>
-        <p>Ce que les feuilles de saison contiennent, à reporter au registre ci-dessus.</p>
-        <div id="dgAutoTitles"></div>
-
         <h3>Le Blood Bowl · Champions en titre <span class="badge b-maison">Maison</span></h3>
-        <p>Le vainqueur du Tournoi de la cinquième semaine porte le titre jusqu'au Blood Bowl suivant. Distinction honorifique : aucun effet mécanique, uniquement le droit de le rappeler à tout le monde. La dernière ligne remplie remonte en manchette de La Une.</p>
+        <p>Le vainqueur du Tournoi de la cinquième semaine, ou de celui nommé <em>Blood Bowl</em>, porte le titre jusqu'au suivant. Distinction honorifique. Saison, champion et équipe sont relevés automatiquement ; la formule de gueule reste à écrire. La dernière ligne remonte en manchette de La Une.</p>
         <div class="t-scroll">
           <table class="fillable">
             <thead><tr><th class="num">Saison</th><th>Champion en titre</th><th>Équipe</th><th>Formule de gueule</th></tr></thead>
@@ -1009,15 +1007,15 @@
     <section class="panel" id="p3" role="tabpanel">
       <div class="sheet">
         <h2>Calendrier — Cycle I</h2>
-        <p class="kicker">Quatre saisons, une finale</p>
+        <p class="kicker">Quatre saisons, une finale · rempli depuis les feuilles de saison <span class="badge b-auto">Calculé</span></p>
         <div class="t-scroll">
           <table class="fillable">
             <thead><tr><th class="num">Saison</th><th>Date</th><th>Options</th><th class="num">Effectif</th><th>Champion</th><th>Notes</th></tr></thead>
             <tbody>
-              <tr class="blank"><td class="num">1</td><td></td><td>Aucune</td><td></td><td></td><td></td></tr>
-              <tr class="blank"><td class="num">2</td><td></td><td>Stades</td><td></td><td></td><td></td></tr>
-              <tr class="blank"><td class="num">3</td><td></td><td>Arbitre + Balles</td><td></td><td></td><td></td></tr>
-              <tr class="blank"><td class="num">4</td><td></td><td>Toutes</td><td></td><td></td><td></td></tr>
+              <tr class="blank"><td class="num">1</td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr class="blank"><td class="num">2</td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr class="blank"><td class="num">3</td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr class="blank"><td class="num">4</td><td></td><td></td><td></td><td></td><td></td></tr>
             </tbody>
           </table>
         </div>
@@ -1043,7 +1041,8 @@
           <button class="btn" type="button" data-season="6" aria-pressed="false">S6</button>
         </div>
 
-        <p><strong>Date</strong> <span class="edit-line" data-k="date"></span> · <strong>Options</strong> <span class="edit-line" data-k="options"></span></p>
+        <p><strong>Cycle</strong> <span class="edit-line" data-k="cycle"></span> · <strong>Date</strong> <span class="edit-line" data-k="date"></span> · <strong>Options</strong> <span class="edit-line" data-k="options"></span></p>
+        <div class="note"><span class="lab">Cette feuille alimente tout le carnet</span>Classement, Calendrier, Palmarès, Rosters et le registre des équipes se remplissent à partir d'ici. Les cases ainsi remplies portent un liseré vert ; écrire par-dessus l'emporte définitivement sur le calcul.</div>
 
         <div class="t-scroll">
           <table class="fillable">
@@ -1089,59 +1088,19 @@
           </table>
         </div>
 
+        <h3>Recrues du soir, destination <span class="badge b-auto">Calculé</span></h3>
+        <div id="dgAutoMarket"></div>
+
         <h3>Faits marquants</h3>
         <p>Blessures spectaculaires, expulsions, retournements de fin de tournoi. Matière première du <em>Spike!</em>.</p>
         <div class="edit-block" data-k="faits"></div>
       </div>
     </section>
 
-    <section class="panel" id="p7" role="tabpanel">
-      <div class="sheet">
-        <h2>Marché des transferts</h2>
-        <p class="kicker">Vidé en fin de Cycle · les stars maison n'y entrent jamais</p>
-        <div class="t-scroll">
-          <table class="fillable">
-            <thead><tr><th>Star Player</th><th>Sous-division</th><th>Versé par</th><th>Drafté par</th></tr></thead>
-            <tbody>
-              <tr class="blank"><td></td><td></td><td></td><td></td></tr>
-              <tr class="blank"><td></td><td></td><td></td><td></td></tr>
-              <tr class="blank"><td></td><td></td><td></td><td></td></tr>
-              <tr class="blank"><td></td><td></td><td></td><td></td></tr>
-              <tr class="blank"><td></td><td></td><td></td><td></td></tr>
-              <tr class="blank"><td></td><td></td><td></td><td></td></tr>
-              <tr class="blank"><td></td><td></td><td></td><td></td></tr>
-              <tr class="blank"><td></td><td></td><td></td><td></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="note"><span class="lab">Ordre du draft</span>Du dernier au premier du classement de Cycle. Le champion sert en dernier.</div>
-
-        <h3>Loyautés — stars conservées d'office <span class="badge b-maison">Maison</span></h3>
-        <p>Un Star Player portant le logo de l'équipe du manager qui l'a recruté ne rejoint pas le marché : il reste dans son deck Équipe jusqu'à la fin du Cycle. Il occupe un des trois contrats. Le marché ne contient donc que les mercenaires et les stars des autres équipes.</p>
-        <div class="t-scroll">
-          <table class="fillable">
-            <thead><tr><th>Manager</th><th>Équipe</th><th>Star Player conservé</th><th class="num">Depuis S</th><th>Carte retirée en échange</th></tr></thead>
-            <tbody>
-              <tr class="blank"><td></td><td></td><td></td><td></td><td></td></tr>
-              <tr class="blank"><td></td><td></td><td></td><td></td><td></td></tr>
-              <tr class="blank"><td></td><td></td><td></td><td></td><td></td></tr>
-              <tr class="blank"><td></td><td></td><td></td><td></td><td></td></tr>
-              <tr class="blank"><td></td><td></td><td></td><td></td><td></td></tr>
-              <tr class="blank"><td></td><td></td><td></td><td></td><td></td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3>Recrues relevées sur les feuilles de saison <span class="badge b-auto">Calculé</span></h3>
-        <p>Réparties d'après la colonne « Logo de l'équipe ? » de chaque feuille : au logo, la star reste au roster ; sinon, elle part au marché.</p>
-        <div id="dgAutoMarket"></div>
-      </div>
-    </section>
-
     <section class="panel" id="p6" role="tabpanel">
       <div class="sheet">
-        <h2>Rosters et contrats</h2>
-        <p class="kicker">Trois contrats maximum par manager</p>
+        <h2>Rosters, contrats et marché</h2>
+        <p class="kicker">Trois contrats maximum par manager · rempli depuis les feuilles de saison <span class="badge b-auto">Calculé</span></p>
         <div class="t-scroll">
           <table class="fillable">
             <thead><tr><th>Manager</th><th>Équipe</th><th>Sous-division</th><th>Contrat 1</th><th>Contrat 2</th><th>Contrat 3</th><th>Cartes retirées</th></tr></thead>
@@ -1154,8 +1113,14 @@
             </tbody>
           </table>
         </div>
+        <div class="note"><span class="lab">Les contrats <span class="badge b-maison">Maison</span></span>Les Star Players au logo de l'équipe sont reportés d'office : ce sont les loyautés de RM4. Une star draftée au marché s'ajoute en écrivant par-dessus une case Contrat libre.</div>
+
+        <h3>Marché des transferts <span class="badge b-auto">Calculé</span></h3>
+        <p>Les Star Players recrutés qui ne portent pas le logo de leur équipe. Ordre du draft : du dernier au premier du classement de Cycle, le champion sert en dernier. Marché vidé en fin de Cycle.</p>
+        <div id="dgMarket"></div>
+
         <h3>Les douze équipes officielles <span class="badge b-officiel">Officiel</span></h3>
-        <p>Le tableau complet des trente-trois équipes, avec difficulté, style, stade et coach, se trouve dans l'onglet Legendary Ed.</p>
+        <p>Le tableau complet des trente-trois équipes, avec difficulté, style et règles spéciales, se consulte dans le <a href="lexique.html">lexique des règles</a>, onglet Équipes.</p>
         <div class="t-scroll">
           <table>
             <thead><tr><th>Boîte</th><th>Équipes</th></tr></thead>
@@ -1167,8 +1132,8 @@
           </table>
         </div>
 
-        <h3>Registre des équipes déjà jouées</h3>
-        <p>Indispensable pour appliquer l'interdiction de répétition : une équipe inscrite ici ne peut plus être choisie par personne.</p>
+        <h3>Registre des équipes déjà jouées <span class="badge b-auto">Calculé</span></h3>
+        <p>Indispensable pour appliquer l'interdiction de répétition RM5 : une équipe inscrite ici ne peut plus être choisie par personne. Alimenté par les feuilles de saison.</p>
         <div class="t-scroll">
           <table class="fillable">
             <thead><tr><th>Équipe</th><th>Cycle</th><th>Manager</th><th>Résultat</th></tr></thead>
@@ -1181,156 +1146,6 @@
             </tbody>
           </table>
         </div>
-      </div>
-    </section>
-
-    <section class="panel" id="p11" role="tabpanel">
-      <div class="sheet">
-        <h2>Legendary Edition</h2>
-        <p class="kicker">Extension fan made · livret VF dépouillé</p>
-
-        <div class="note"><span class="lab">Source</span>
-        Tout ce qui suit vient du livret <em>Legendary Rules-single-PAGE-FR</em>, 48 pages, version française. Extension non officielle, sans lien avec FFG ni Games Workshop, produite sans but lucratif par Mickaël « Froh » Garcin au game design, Baptiste Toublanc « Ytrom » au graphisme, Enzo au team design et Alanih Kerr au lore, entre 2018 et 2024.</div>
-
-        <h3>Le décompte officiel</h3>
-        <p>Vingt et une nouvelles équipes complètent les douze du jeu de base et de ses extensions, soit <strong>trente-trois équipes</strong> réparties en onze syndicats. Le jeu de base reste indispensable.</p>
-
-        <div class="t-scroll">
-          <table>
-            <caption>Les onze syndicats</caption>
-            <thead><tr><th>Sigle</th><th>Nom complet</th><th>Origine</th><th class="num">Page</th></tr></thead>
-            <tbody>
-              <tr><td>OWA</td><td>Old World Association</td><td>Jeu de base</td><td class="num">06</td></tr>
-              <tr><td>CWC</td><td>Chaos Wastes Confederation</td><td>Jeu de base</td><td class="num">08</td></tr>
-              <tr><td>DSS</td><td>Dark Sorcery Syndicate</td><td>Mort Subite</td><td class="num">10</td></tr>
-              <tr><td>PPG</td><td>Putrid Players' Guild</td><td>Coup Bas</td><td class="num">12</td></tr>
-              <tr><td>CABAL</td><td>Cabal Vision</td><td>Legendary</td><td class="num">14</td></tr>
-              <tr><td>WOA</td><td>World Outsiders Association</td><td>Legendary</td><td class="num">18</td></tr>
-              <tr><td>ALL</td><td>Ancient Legendary League</td><td>Legendary</td><td class="num">22</td></tr>
-              <tr><td>AFI</td><td>Albion Football Institution</td><td>Legendary</td><td class="num">24</td></tr>
-              <tr><td>TCD</td><td>Tomb Crushers Division</td><td>Legendary</td><td class="num">28</td></tr>
-              <tr><td>FFS</td><td>Foul Fiends Syndicate</td><td>Legendary</td><td class="num">36</td></tr>
-              <tr><td>NAF</td><td>Nuffle Amorical Football</td><td>Legendary</td><td class="num">40</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3>Les trente-trois équipes</h3>
-        <p>Le livret donne pour chacune un niveau de difficulté et un style de jeu. Les lignes grisées sont les équipes officielles, les autres viennent de la Legendary. Chaque ligue Legendary dispose en outre de son propre deck de Mercenaires.</p>
-        <div class="t-scroll">
-          <table>
-            <thead><tr><th>Équipe</th><th>Ligue</th><th>Race</th><th>Difficulté</th><th>Style</th><th>Stade</th><th>Coach</th></tr></thead>
-            <tbody>
-              <tr class="off"><td><strong>Reikland Reavers</strong></td><td>OWA</td><td>Humains</td><td>Faible</td><td>Polyvalent</td><td>The Altdorf Oldbowl</td><td>JJ Griswell Jr.</td></tr>
-              <tr class="off"><td><strong>Athelorn Avengers</strong></td><td>OWA</td><td>Elfes Sylvains</td><td>Moyenne</td><td>Passe</td><td>Inconnu</td><td>Aed Hothriss</td></tr>
-              <tr class="off"><td><strong>Grudgebearers</strong></td><td>OWA</td><td>Nains</td><td>Haute</td><td>Dur à cuire</td><td>Inconnu</td><td>Inconnu</td></tr>
-              <tr class="off"><td><strong>Gouged Eye</strong></td><td>CWC</td><td>Orks</td><td>Faible</td><td>Tacle</td><td>The Doom Dome</td><td>Gort Severlimb</td></tr>
-              <tr class="off"><td><strong>Chaos All-Stars</strong></td><td>CWC</td><td>Chaos</td><td>Moyenne</td><td>Triche</td><td>The Palace of Eternal Suffering</td><td>Inconnu</td></tr>
-              <tr class="off"><td><strong>Skavenblight Scramblers</strong></td><td>CWC</td><td>Skavens</td><td>Faible</td><td>Sprint</td><td>Skavenblight Stade</td><td>Vytik the Many Headed</td></tr>
-              <tr class="off"><td><strong>Black Fangs</strong></td><td>DSS</td><td>Vampires</td><td>Haute</td><td>Pions / Synergie</td><td>Inconnu</td><td>Inconnu</td></tr>
-              <tr class="off"><td><strong>Naggaroth Nightmares</strong></td><td>DSS</td><td>Elfes Noirs</td><td>Faible</td><td>Adaptables</td><td>Inconnu</td><td>Duriath Helblade</td></tr>
-              <tr class="off"><td><strong>Champions of Death</strong></td><td>DSS</td><td>Morts-Vivants</td><td>Faible</td><td>Régénération</td><td>Pain Park, Underearth</td><td>Tomolandry the Undying</td></tr>
-              <tr class="off"><td><strong>Nurgle's Rotters</strong></td><td>PPG</td><td>Nurgle</td><td>Haute</td><td>Pions</td><td>Inconnu</td><td>Captain Sven « Four-Eyes » Erikksen</td></tr>
-              <tr class="off"><td><strong>The Lowdown Rats</strong></td><td>PPG</td><td>Gobelins</td><td>Haute</td><td>Combines / Coups bas</td><td>The Swampdome</td><td>Hymie Snivel</td></tr>
-              <tr class="off"><td><strong>The Zharr-Naggrund Ziggurats</strong></td><td>PPG</td><td>Nains du Chaos</td><td>Moyenne</td><td>Triche / Coups bas</td><td>Inconnu</td><td>Inconnu</td></tr>
-              <tr><td><strong>Elfheim Eagles</strong></td><td>CABAL</td><td>Union Elfique</td><td>Haute</td><td>Gain de niveau</td><td>Laurelorn Stade</td><td>Perellian Lamecendre</td></tr>
-              <tr><td><strong>Norsca Rampagers</strong></td><td>CABAL</td><td>Norses</td><td>Faible</td><td>Polyvalent</td><td>Longship Stadium</td><td>Mangus Manglesson</td></tr>
-              <tr><td><strong>Praag Changelings</strong></td><td>CABAL</td><td>Kislev</td><td>Haute</td><td>Synergie</td><td>Praag Stadium</td><td>Inconnu</td></tr>
-              <tr><td><strong>Mongrel Horde</strong></td><td>WOA</td><td>Renégats du Chaos</td><td>Moyenne</td><td>Adaptable</td><td>Inconnu</td><td>Inconnu</td></tr>
-              <tr><td><strong>Oldheim Ogres</strong></td><td>WOA</td><td>Ogres</td><td>Très élevée</td><td>Synergie</td><td>Goadmalice Park</td><td>Glasra Gones</td></tr>
-              <tr><td><strong>Khorne's Killers</strong></td><td>WOA</td><td>Khorne</td><td>Faible</td><td>Tacle</td><td>Inconnu</td><td>Inconnu</td></tr>
-              <tr><td><strong>Amazon All-Stars</strong></td><td>ALL</td><td>Amazones</td><td>Moyenne</td><td>Adaptable</td><td>Inconnu</td><td>Dianna « Mistress of Pain » Thunderlash</td></tr>
-              <tr><td><strong>Sotek's Word</strong></td><td>ALL</td><td>Hommes-Lézards</td><td>Faible</td><td>Polyvalent</td><td>Quetza Temple</td><td>Inconnu</td></tr>
-              <tr><td><strong>Lustria Croakers</strong></td><td>ALL</td><td>Slanns</td><td>Faible</td><td>Sprint</td><td>Inconnu</td><td>Jvêtoudir</td></tr>
-              <tr><td><strong>Galadrieth Gladiators</strong></td><td>AFI</td><td>Hauts Elfes</td><td>Faible</td><td>Esquive</td><td>Laurelorn Stadium</td><td>Perellian Lamecendre</td></tr>
-              <tr><td><strong>Bright Crusaders</strong></td><td>AFI</td><td>Bretonniens</td><td>Moyenne</td><td>Polyvalent</td><td>Inconnu</td><td>Inconnu</td></tr>
-              <tr><td><strong>Greenfield Grasshuggers</strong></td><td>AFI</td><td>Halflings</td><td>Haute</td><td>Synergie / Pions</td><td>Dinner Dome</td><td>Hungry Draco</td></tr>
-              <tr><td><strong>Neter-Khertet</strong></td><td>TCD</td><td>Khemri</td><td>Haute</td><td>Synergie / Prince du tombeau</td><td>Inconnu</td><td>Inconnu</td></tr>
-              <tr><td><strong>Underworld Creepers</strong></td><td>TCD</td><td>Underworld</td><td>Très élevée</td><td>Synergie / Warpstone</td><td>Underworld Coliseum</td><td>Lance Fleshbarb</td></tr>
-              <tr><td><strong>Bruendar Grimjacks</strong></td><td>TCD</td><td>Nécromantiques</td><td>Très élevée</td><td>Synergie / Phase de Lune</td><td>The Graveyard</td><td>Inconnu</td></tr>
-              <tr><td><strong>The Midden Moors Marauders</strong></td><td>FFS</td><td>Slaanesh</td><td>Moyenne</td><td>Pions</td><td>Middenheim Arena</td><td>Uthar Hagg</td></tr>
-              <tr><td><strong>Drakwald Beasts</strong></td><td>FFS</td><td>Tzeentch</td><td>Très élevée</td><td>Mutations</td><td>Inconnu</td><td>Inconnu</td></tr>
-              <tr><td><strong>Frozen Phantoms</strong></td><td>FFS</td><td>Éthérés</td><td>Haute</td><td>Synergie</td><td>Inconnu</td><td>Inconnu</td></tr>
-              <tr><td><strong>Orcland Raiders</strong></td><td>NAF</td><td>Orques Noirs</td><td>Haute</td><td>Synergie / Pions</td><td>Skull Stadium</td><td>Cruel-Eye</td></tr>
-              <tr><td><strong>Evil Gitz</strong></td><td>NAF</td><td>Squigs</td><td>Haute</td><td>Squig Géant / Joueurs ingérés</td><td>Inconnu</td><td>Inconnu</td></tr>
-              <tr><td><strong>Bögenhafen Barons</strong></td><td>NAF</td><td>Impériaux</td><td>Haute</td><td>Synergie</td><td>Bögenhafen Stade</td><td>Tobias Rheinlich</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3>Répartition par difficulté</h3>
-        <p>Donnée directement exploitable pour la campagne : elle dit quelle équipe confier à un manager qui découvre, et laquelle réserver aux vétérans.</p>
-        <div class="t-scroll">
-          <table>
-            <thead><tr><th>Niveau</th><th class="num">Nb</th><th>Équipes</th></tr></thead>
-            <tbody>
-              <tr><td><strong>Faible</strong></td><td class="num">10</td><td>Reikland Reavers · Gouged Eye · Skavenblight Scramblers · Naggaroth Nightmares · Champions of Death · Norsca Rampagers · Khorne's Killers · Sotek's Word · Lustria Croakers · Galadrieth Gladiators</td></tr>
-              <tr><td><strong>Moyenne</strong></td><td class="num">7</td><td>Athelorn Avengers · Chaos All-Stars · Zharr-Naggrund Ziggurats · Mongrel Horde · Amazon All-Stars · Bright Crusaders · Midden Moors Marauders</td></tr>
-              <tr><td><strong>Haute</strong></td><td class="num">12</td><td>Grudgebearers · Black Fangs · Nurgle's Rotters · Lowdown Rats · Elfheim Eagles · Praag Changelings · Greenfield Grasshuggers · Neter-Khertet · Frozen Phantoms · Orcland Raiders · Evil Gitz · Bögenhafen Barons</td></tr>
-              <tr><td><strong>Très élevée</strong></td><td class="num">4</td><td>Oldheim Ogres · Underworld Creepers · Bruendar Grimjacks · Drakwald Beasts</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3>Les neuf règles spéciales</h3>
-        <p>Neuf équipes seulement ajoutent une mécanique propre. Les vingt-quatre autres se jouent sans sous-règle : la mise en place n'en souffre pas.</p>
-
-        <div class="t-scroll">
-          <table>
-            <thead><tr><th>Équipe</th><th>Mécanique</th><th>En deux mots</th></tr></thead>
-            <tbody>
-              <tr><td><strong>Elfheim Eagles</strong></td><td>Joueur Vétéran</td><td>Chaque joueur a une seconde carte dorée, améliorée. À chaque match gagné avec une prime d'Amélioration d'Équipe, on pioche un Vétéran au hasard et il remplace sa version normale dans le deck. Plusieurs améliorations gagnées = autant de Vétérans piochés, un seul gardé.</td></tr>
-              <tr><td><strong>Greenfield Grasshuggers</strong></td><td>Pions Nourriture</td><td>Réserve de 15 pions face cachée constituée en phase d'Entretien. Un effet attribue un pion tiré au hasard, posé sur la carte du joueur et révélé aussitôt : 3 donnent un fan, 2 ne font rien, 6 ajoutent 1 de Puissance, 2 en ajoutent 2, 2 en retirent 2. L'effet dure jusqu'à la phase de score.</td></tr>
-              <tr><td><strong>Neter-Khertet</strong></td><td>Immortalité + Pharaon</td><td>Le Prince du Tombeau ne peut être ni couché ni blessé par un effet adverse. La compétence Pharaon, présente dans un match, débloque les capacités Pharaon des joueurs amis engagés ensuite dans ce même match.</td></tr>
-              <tr><td><strong>Underworld Creepers</strong></td><td>Fragments de Warpstone</td><td>Les joueurs arrivent avec des fragments qui s'additionnent dans le match. Certaines capacités ne s'activent qu'au-delà d'un seuil de Warpstone ; d'autres fragments servent à activer les compétences couché.</td></tr>
-              <tr><td><strong>Bruendar Grimjacks</strong></td><td>Phases de la Lune</td><td>Une carte recto-verso posée près du Spike! Magazine, face Morrslieb au départ de chaque saison. Selon la face active, seules les capacités Morrslieb ou Mannslieb fonctionnent. Une compétence obligatoire de changement de phase, toujours résolue en dernier, retourne la carte.</td></tr>
-              <tr><td><strong>Drakwald Beasts</strong></td><td>Mutations + Horreurs</td><td>Deck de 11 cartes Mutation piochées au hasard et assignées aux joueurs, résolues immédiatement, actives jusqu'à la fin de la phase de score. L'Horreur Rose couchée se scinde en 2 Horreurs Bleues, tenues hors du deck Équipe comme des pions.</td></tr>
-              <tr><td><strong>Orcland Raiders</strong></td><td>Pions Chomp</td><td>Trois pions posés en phase d'Entretien. Placé sur un match, un pion annule chez les joueurs adverses la prochaine utilisation de la compétence indiquée. Récupérés à l'Entretien suivant.</td></tr>
-              <tr><td><strong>Bögenhafen Barons</strong></td><td>Bannières</td><td>Trois pions posés sur les Temps Forts, affectant tous les joueurs amis du match : Gloire donne 1 fan en phase de score, Force ajoute 1 de Puissance, Prestige donne Stabilité — le porteur du ballon ne peut plus être taclé. Seules les Améliorations d'Équipe peuvent les déplacer.</td></tr>
-              <tr><td><strong>Evil Gitz</strong></td><td>Squig Géant + Ingérer</td><td>Le Squig Géant est un joueur en deux cartes, à réunir en main pour être engagé. La capacité Ingérer place un joueur sous la carte du Squig : en phase de score, sa Puissance redressée s'ajoute à celle du Squig.</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3>Les deux modules bonus</h3>
-        <p><strong>Tournois.</strong> N'importe quelle carte Spike! Magazine peut être remplacée par l'un des nouveaux tournois, au hasard ou dans l'ordre choisi, ce qui permet de composer un circuit local et de varier les saisons. Le livret classe les tournois par couleur : Challenger Circuit, Super 7, Tournaments of Champions et Majors. Certaines primes rapportent des pions Régénération ou Triche, stockés par le manager et assignables à un joueur à tout moment de son tour ; un pion défaussé retourne à la boîte, pas au stock.</p>
-        <p><strong>Ballons Enchantés.</strong> À l'étape « Préparer le coup d'envoi » de chaque phase d'Entretien, on lance 2 dés pour chaque carte Temps Fort en jeu et on assigne le ballon correspondant au résultat. Sur un 7, on mélange les cartes numérotées 7 et on en tire une au hasard.</p>
-
-        <h3>Ce que ça change dans la campagne <span class="badge b-maison">Maison</span></h3>
-
-        <p><strong>RM4, le marché des transferts.</strong> Sept decks de Stars supplémentaires et sept decks de Mercenaires : le plafond de trois contrats ne menace plus aucun vivier. Point en suspens résolu.</p>
-
-        <p><strong>RM5, l'interdiction de répétition — règle adoptée.</strong> Trente-trois équipes, choix libre dans l'ordre inversé du classement, aucune reprise d'une équipe déjà jouée lors d'un Cycle précédent. Registre dans l'onglet Rosters.</p>
-        <div class="t-scroll">
-          <table>
-            <caption>Durée avant épuisement du catalogue</caption>
-            <thead><tr><th class="num">Managers</th><th class="num">Équipes par Cycle</th><th class="num">Cycles</th><th class="num">Saisons jouées</th></tr></thead>
-            <tbody>
-              <tr><td class="num">3</td><td class="num">3</td><td class="num">11</td><td class="num">44</td></tr>
-              <tr><td class="num">4</td><td class="num">4</td><td class="num">8</td><td class="num">32</td></tr>
-              <tr><td class="num">5</td><td class="num">5</td><td class="num">6</td><td class="num">24</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <p><strong>Le niveau de difficulté, levier nouveau.</strong> Le livret note chaque équipe de Faible à Très élevée. Deux façons d'en tirer parti, à trancher :</p>
-        <div class="t-scroll">
-          <table>
-            <thead><tr><th>Option</th><th>Texte</th><th>Effet</th><th>Risque</th></tr></thead>
-            <tbody>
-              <tr><td><strong>Prime de difficulté</strong></td><td>Un manager qui joue une équipe Très élevée marque +1 point de ligue sur chacune de ses saisons du Cycle.</td><td>Rend les quatre équipes exigeantes attractives au lieu d'être subies en fin de catalogue.</td><td>Une sous-règle de plus, et un point vaut cher dans un barème compressé. À tester sur un Cycle avant d'adopter.</td></tr>
-              <tr><td><strong>Ordre de service</strong></td><td>Aucune prime. Mais un manager qui n'a jamais gagné de Cycle ne peut pas choisir une équipe Très élevée.</td><td>Coût zéro, protège les débutants, garde les équipes difficiles pour ceux qui les demandent.</td><td>Paternaliste, et bloque un manager qui voulait précisément relever le défi.</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <p><strong>RM6, la rotation des options.</strong> Les Tournois Legendary et les Ballons Enchantés Legendary s'ajoutent aux axes de rotation existants. Ces ballons-ci se tirent aux dés, un jet par Temps Fort, là où Mort Subite les distribue autrement — le livret ne dit pas explicitement si les deux lots se mélangent ou se remplacent, à trancher à la première partie qui les active.</p>
-
-        <div class="note"><span class="lab">Recommandation d'équilibrage</span>
-        Les quatre équipes Très élevée — Oldheim Ogres, Underworld Creepers, Bruendar Grimjacks, Drakwald Beasts — cumulent une mécanique propre lourde et un pilotage exigeant. Les réserver aux saisons 2 et 3 d'un Cycle, jamais à la saison 4 qui décide du titre, tant que la table ne les a pas prises en main.</div>
-
-        <h3>Notes de table</h3>
-        <div class="edit-block" data-k="le-notes"></div>
       </div>
     </section>
 
@@ -1464,6 +1279,40 @@
 
           <div class="note"><span class="lab">Points non garantis <span class="badge b-doute">À vérifier</span></span>La répartition exacte des cartes Tournoi entre les quatre circuits Legendary reste à relever carte par carte, et il n'est pas établi si la Legendary reclasse <em>The Blood Bowl</em> du jeu de base dans l'un d'eux. Tant que le relevé n'est pas fait, monter le deck à vue de nez : les Tournois du jeu de base et des extensions FFG en haut, les cartes Legendary marquées Majors juste avant le Blood Bowl.</div>
         </article>
+
+        <h3>Le matériel Legendary et la campagne <span class="badge b-maison">Maison</span></h3>
+        <div class="note"><span class="lab">Source</span>Livret <em>Legendary Rules-single-PAGE-FR</em>, 48 pages. Extension non officielle, sans lien avec FFG ni Games Workshop, produite sans but lucratif par Mickaël « Froh » Garcin au game design, Baptiste Toublanc « Ytrom » au graphisme, Enzo au team design et Alanih Kerr au lore, entre 2018 et 2024. Le détail des trente-trois équipes — difficulté, style, règles spéciales — se consulte dans le lexique des règles.</div>
+
+        <p><strong>RM4, le marché des transferts.</strong> Sept decks de Stars supplémentaires et sept decks de Mercenaires : le plafond de trois contrats ne menace plus aucun vivier. Point en suspens résolu.</p>
+
+        <p><strong>RM5, l'interdiction de répétition — règle adoptée.</strong> Trente-trois équipes, choix libre dans l'ordre inversé du classement, aucune reprise d'une équipe déjà jouée lors d'un Cycle précédent. Registre dans l'onglet Rosters.</p>
+        <div class="t-scroll">
+          <table>
+            <caption>Durée avant épuisement du catalogue</caption>
+            <thead><tr><th class="num">Managers</th><th class="num">Équipes par Cycle</th><th class="num">Cycles</th><th class="num">Saisons jouées</th></tr></thead>
+            <tbody>
+              <tr><td class="num">3</td><td class="num">3</td><td class="num">11</td><td class="num">44</td></tr>
+              <tr><td class="num">4</td><td class="num">4</td><td class="num">8</td><td class="num">32</td></tr>
+              <tr><td class="num">5</td><td class="num">5</td><td class="num">6</td><td class="num">24</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p><strong>Le niveau de difficulté, levier nouveau.</strong> Le livret note chaque équipe de Faible à Très élevée. Deux façons d'en tirer parti, à trancher :</p>
+        <div class="t-scroll">
+          <table>
+            <thead><tr><th>Option</th><th>Texte</th><th>Effet</th><th>Risque</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Prime de difficulté</strong></td><td>Un manager qui joue une équipe Très élevée marque +1 point de ligue sur chacune de ses saisons du Cycle.</td><td>Rend les quatre équipes exigeantes attractives au lieu d'être subies en fin de catalogue.</td><td>Une sous-règle de plus, et un point vaut cher dans un barème compressé. À tester sur un Cycle avant d'adopter.</td></tr>
+              <tr><td><strong>Ordre de service</strong></td><td>Aucune prime. Mais un manager qui n'a jamais gagné de Cycle ne peut pas choisir une équipe Très élevée.</td><td>Coût zéro, protège les débutants, garde les équipes difficiles pour ceux qui les demandent.</td><td>Paternaliste, et bloque un manager qui voulait précisément relever le défi.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p><strong>RM6, la rotation des options.</strong> Les Tournois Legendary et les Ballons Enchantés Legendary s'ajoutent aux axes de rotation existants. Ces ballons-ci se tirent aux dés, un jet par Temps Fort, là où Mort Subite les distribue autrement — le livret ne dit pas explicitement si les deux lots se mélangent ou se remplacent, à trancher à la première partie qui les active.</p>
+
+        <div class="note"><span class="lab">Recommandation d'équilibrage</span>
+        Les quatre équipes Très élevée — Oldheim Ogres, Underworld Creepers, Bruendar Grimjacks, Drakwald Beasts — cumulent une mécanique propre lourde et un pilotage exigeant. Les réserver aux saisons 2 et 3 d'un Cycle, jamais à la saison 4 qui décide du titre, tant que la table ne les a pas prises en main.</div>
       </div>
     </section>
 
@@ -1507,6 +1356,10 @@
         </div>
         <p id="storageInfo" class="fill"></p>
 
+        <h3>Notes libres</h3>
+        <p>Le bloc-notes du carnet : points à trancher, rappels, idées de règles en attente.</p>
+        <div class="edit-block" data-k="notes-libres"></div>
+
         <h3>Diagnostic de la sauvegarde en ligne</h3>
         <p>À utiliser quand le carnet ne se partage pas entre appareils. Le test lit puis écrit une ligne dans Supabase et affiche le code HTTP exact de chaque étape.</p>
         <div class="tools">
@@ -1516,26 +1369,6 @@
       </div>
     </section>
 
-    <section class="panel" id="p10" role="tabpanel">
-      <div class="sheet">
-        <h2>Points en suspens</h2>
-        <p class="kicker">À trancher avant ou après la saison 1</p>
-        <ul class="todo">
-          <li>Noms des managers et équipes choisies pour le Cycle I.</li>
-          <li>Trancher entre la prime de difficulté et l'ordre de service pour les quatre équipes Très élevée.</li>
-          <li><strong>RM7 —</strong> relever carte par carte la répartition des Tournois entre les quatre circuits Legendary, et vérifier si <em>The Blood Bowl</em> du jeu de base y est reclassé.</li>
-          <li><strong>RM7 —</strong> mesurer après le Cycle I si le deck monté par prestige coûte trop de rejouabilité. Si oui, revenir au montage aléatoire et garder le reste de la règle.</li>
-          <li><strong>RM4 —</strong> surveiller au Cycle I si la loyauté avantage les équipes riches en Star Players à leur logo. Correctif prêt : ne protéger que 2 stars sur 3.</li>
-          <li>Décider, à l'épuisement du catalogue, si l'interdiction de répétition repart à zéro ou glisse sur les derniers Cycles. Pas avant deux ans.</li>
-          <li>Trancher la rotation des options : croissante (défaut) ou décroissante.</li>
-          <li>Décider si un match d'appui à 2 est praticable en cas d'égalité de Cycle.</li>
-          <li>Vérifier à la première partie concernée si les Ballons Enchantés Legendary se mélangent à ceux de Mort Subite ou les remplacent.</li>
-          <li>Nommer les trophées et poser les rivalités — habillage à écrire après la saison 1.</li>
-        </ul>
-        <h3>Notes libres</h3>
-        <div class="edit-block" data-k="notes-libres"></div>
-      </div>
-    </section>
   </main>
 
   <footer>Carnet de campagne · Cycle I · règles maison v2 — RM7 et loyauté</footer>
@@ -2135,17 +1968,6 @@
     return h;
   }
 
-  function autoTitlesHTML(L){
-    var rows = [];
-    L.seasons.forEach(function(s){
-      s.tours.forEach(function(t){
-        rows.push([s.n, t.c[0], t.c[1], t.c[2], t.c[3]]);
-      });
-    });
-    if(!rows.length) return '<p class="dg-empty">Aucun Tournoi saisi sur les feuilles de saison.</p>';
-    return '<div class="auto"><span class="lab">Relevé · ' + rows.length + ' tournoi(s)</span>'
-      + tableHTML(["Saison", "Semaine", "Tournoi", "Circuit", "Vainqueur"], rows) + "</div>";
-  }
 
   function autoMarketHTML(L){
     var loyal = [], market = [], todo = 0;
@@ -2200,16 +2022,9 @@
     var L = ledger();
     var el;
     if((el = document.getElementById("dgLedger")))     el.innerHTML = ledgerHTML(L);
-    if((el = document.getElementById("dgAutoTitles"))) el.innerHTML = autoTitlesHTML(L);
     if((el = document.getElementById("dgAutoMarket"))) el.innerHTML = autoMarketHTML(L);
     if((el = document.getElementById("dgAutoCal")))    el.innerHTML = autoCalHTML(L);
-    var btn = document.getElementById("copyLedger");
-    if(btn){
-      btn.disabled = !L.list.length || L.order.length > 4;
-      btn.title = L.order.length > 4
-        ? "Report impossible au-delà de quatre saisons : le tableau du classement n'a que quatre colonnes."
-        : "Écrase le tableau du classement avec la projection ci-dessous.";
-    }
+    if((el = document.getElementById("dgMarket")))     el.innerHTML = marketHTML();
   }
 
 
@@ -2255,8 +2070,6 @@
     "p5#t0": {0:"managers", 1:"teams", 4:"rank", 5:"points"},
     "p5#t1": {0:"managers", 2:"leagues", 3:"yesno"},
     "p5#t2": {0:"week", 2:"circuits", 3:"managers"},
-    "p7#t0": {1:"leagues", 2:"managers", 3:"managers"},
-    "p7#t1": {0:"managers", 1:"teams", 3:"season"},
     "p6#t0": {0:"managers", 1:"teams", 2:"leagues"},
     "p6#t1": {0:"teams", 1:"cycle", 2:"managers"}
   };
@@ -2507,41 +2320,275 @@
     placePop(popCell);
   }, true);
 
-  function renderAll(){
-    if(recomputePoints()){
-      var p5 = document.getElementById("p5");
-      if(p5) hydratePanel(p5);
-      queueSave();
+
+  /* =====================================================================
+     REMPLISSAGE AUTOMATIQUE
+     Une valeur calculee n'ecrase jamais une saisie manuelle : on retient
+     dans auto|<cle> ce qu'on a ecrit soi-meme. Si la cellule en differe,
+     c'est que la main est passee dessus, et on n'y touche plus.
+     ===================================================================== */
+
+  var AUTO_KEYS = {};   /* cles remplies au dernier passage, pour le liseré */
+  var DIRTY = {};       /* panneaux a reconstruire, pour ne pas tout refaire */
+
+  function autoSet(key, val){
+    val = (val == null) ? "" : String(val).trim();
+    var cur = state[key], mine = state["auto|" + key];
+    var manual = (cur !== undefined && cur !== "" && cur !== mine);
+    if(manual) return false;
+    AUTO_KEYS[key] = 1;
+    if(val === ""){
+      if(cur === undefined && mine === undefined) return false;
+      delete state[key]; delete state["auto|" + key];
+      DIRTY[panelOfKey(key)] = 1;
+      return true;
     }
-    renderDigest();
-    renderAuto();
+    if(cur === val && mine === val) return false;
+    state[key] = val; state["auto|" + key] = val;
+    DIRTY[panelOfKey(key)] = 1;
+    return true;
   }
 
-  /* ---------- report manuel vers le tableau du classement ---------- */
-  function copyLedger(){
-    var L = ledger();
-    if(!L.list.length || L.order.length > 4) return;
-    if(!window.confirm("Remplacer le contenu du tableau de classement par le report automatique ? Les saisies manuelles de ce tableau seront perdues.")) return;
-    var tid = "p4#t0", r, c;
-    for(r = 0; r < 40; r++){
-      for(c = 0; c < 9; c++){ delete state[tid + "|" + r + "|" + c]; }
-    }
-    L.list.forEach(function(m, i){
-      state[tid + "|" + i + "|0"] = m.name;
-      state[tid + "|" + i + "|1"] = m.team;
-      L.order.forEach(function(sn){
-        var col = 2 + (parseInt(sn, 10) - 1);
-        if(col >= 2 && col <= 5 && m.pts[sn] !== undefined) state[tid + "|" + i + "|" + col] = String(m.pts[sn]);
-      });
-      state[tid + "|" + i + "|6"] = String(m.leader ? 0 : m.majKept);
-      state[tid + "|" + i + "|7"] = String(m.total);
-      state[tid + "|" + i + "|8"] = String(m.rank);
-    });
-    state["rows|" + tid] = Math.max(5, L.list.length);
-    hydratePanel(document.getElementById("p4"));
-    queueSave();
-    renderAll();
+  /* "p4#t0|2|3" -> "p4" ; "S1|p5#t0|0|5" -> "p5" */
+  function panelOfKey(key){
+    var m = /(?:^|\|)(p\d+)(?:#|\|)/.exec(key);
+    return m ? m[1] : "";
   }
+
+  function wantRows(tid, count, base){
+    var key = "rows|" + tid, want = Math.max(base, count);
+    if(parseInt(state[key] || base, 10) >= want) return false;
+    state[key] = want;
+    DIRTY[panelOfKey(tid)] = 1;
+    return true;
+  }
+
+  function romanOf(sn){
+    var i = Math.ceil(parseInt(sn, 10) / 4);
+    return ["", "I", "II", "III", "IV", "V", "VI"][i] || "I";
+  }
+  function cycleOf(sn){
+    return (state["S" + sn + "|p5|cycle"] || "").trim() || romanOf(sn);
+  }
+
+  /* options par defaut de RM6, selon le rang de la saison dans le Cycle */
+  var RM6 = ["Aucune", "Stades", "Arbitre + Balles", "Toutes"];
+  function optionsOf(sn){
+    var v = (state["S" + sn + "|p5|options"] || "").trim();
+    if(v) return v;
+    var rank = ((parseInt(sn, 10) - 1) % 4);
+    return RM6[rank];
+  }
+
+  /* vainqueur d'une saison : rang 1, sinon le plus grand total de fans */
+  function winnerOf(s){
+    var byRank = s.res.filter(function(r){ return num(r.c[4]) === 1; });
+    if(byRank.length) return byRank[0];
+    var best = null;
+    s.res.forEach(function(r){
+      var f = num(r.c[3]);
+      if(f !== null && (best === null || f > num(best.c[3]))) best = r;
+    });
+    return best;
+  }
+
+  /* equipe d'un manager, telle que la derniere feuille la connait */
+  function teamOf(seasons, name){
+    var k = norm(name), t = "";
+    seasons.forEach(function(s){
+      s.res.forEach(function(r){ if(norm(r.c[0]) === k && r.c[1]) t = r.c[1]; });
+    });
+    return t;
+  }
+
+  function autofill(){
+    var L = ledger(), seasons = L.seasons, touched = false;
+    AUTO_KEYS = {};
+    DIRTY = {};
+
+    /* ---------- Calendrier : date, options, effectif, champion ---------- */
+    for(var i = 0; i < 6; i++){
+      var sn = String(i + 1);
+      var s = seasons.filter(function(x){ return x.n === sn; })[0];
+      var d = "", o = "", eff = "", ch = "";
+      if(s){
+        d = s.date;
+        o = optionsOf(sn);
+        eff = s.res.length ? String(s.res.length) : "";
+        var w = s.res.length ? winnerOf(s) : null;
+        ch = w ? w.c[0] : "";
+      }
+      touched = autoSet("p3#t0|" + i + "|1", d) || touched;
+      touched = autoSet("p3#t0|" + i + "|2", o) || touched;
+      touched = autoSet("p3#t0|" + i + "|3", eff) || touched;
+      touched = autoSet("p3#t0|" + i + "|4", ch) || touched;
+    }
+
+    /* ---------- Classement ---------- */
+    touched = wantRows("p4#t0", L.list.length, 5) || touched;
+    for(var r = 0; r < Math.max(5, L.list.length); r++){
+      var m = L.list[r];
+      touched = autoSet("p4#t0|" + r + "|0", m ? m.name : "") || touched;
+      touched = autoSet("p4#t0|" + r + "|1", m ? m.team : "") || touched;
+      for(var c = 0; c < 4; c++){
+        var key = String(c + 1);
+        var v = (m && m.pts[key] !== undefined) ? String(m.pts[key]) : "";
+        touched = autoSet("p4#t0|" + r + "|" + (2 + c), v) || touched;
+      }
+      touched = autoSet("p4#t0|" + r + "|6", m ? String(m.leader ? 0 : m.majKept) : "") || touched;
+      touched = autoSet("p4#t0|" + r + "|7", m ? String(m.total) : "") || touched;
+      touched = autoSet("p4#t0|" + r + "|8", m ? String(m.rank) : "") || touched;
+    }
+
+    /* ---------- Palmarès : champion d'un Cycle complet ---------- */
+    var byCycle = {};
+    seasons.forEach(function(s){
+      if(!s.res.length) return;
+      (byCycle[cycleOf(s.n)] = byCycle[cycleOf(s.n)] || []).push(s);
+    });
+    ["I", "II", "III", "IV"].forEach(function(cy, k){
+      var group = byCycle[cy] || [], champ = "", team = "", tot = "";
+      if(group.length >= 4 && L.list.length){
+        champ = L.list[0].name; team = L.list[0].team; tot = String(L.list[0].total);
+      }
+      touched = autoSet("p8#t0|" + k + "|1", champ) || touched;
+      touched = autoSet("p8#t0|" + k + "|2", team) || touched;
+      touched = autoSet("p8#t0|" + k + "|3", tot) || touched;
+    });
+
+    /* ---------- Palmarès : registre des titres ---------- */
+    var titles = [];
+    seasons.forEach(function(s){
+      s.tours.forEach(function(t){
+        if(!t.c[1] && !t.c[3]) return;
+        titles.push({cy:cycleOf(s.n), sn:s.n, name:t.c[1], circ:t.c[2],
+                     win:t.c[3], team:teamOf(seasons, t.c[3]), week:t.c[0]});
+      });
+    });
+    touched = wantRows("p8#t1", titles.length, 8) || touched;
+    for(var r2 = 0; r2 < Math.max(8, titles.length); r2++){
+      var t2 = titles[r2];
+      touched = autoSet("p8#t1|" + r2 + "|0", t2 ? t2.cy : "") || touched;
+      touched = autoSet("p8#t1|" + r2 + "|1", t2 ? t2.sn : "") || touched;
+      touched = autoSet("p8#t1|" + r2 + "|2", t2 ? t2.name : "") || touched;
+      touched = autoSet("p8#t1|" + r2 + "|3", t2 ? t2.circ : "") || touched;
+      touched = autoSet("p8#t1|" + r2 + "|4", t2 ? t2.win : "") || touched;
+      touched = autoSet("p8#t1|" + r2 + "|5", t2 ? t2.team : "") || touched;
+    }
+
+    /* ---------- Palmarès : Champions en titre du Blood Bowl ---------- */
+    var bb = titles.filter(function(t){
+      return /blood\s*bowl/i.test(t.name || "") || num(t.week) === 5;
+    });
+    touched = wantRows("p8#t2", bb.length, 6) || touched;
+    for(var r3 = 0; r3 < Math.max(6, bb.length); r3++){
+      var b = bb[r3];
+      touched = autoSet("p8#t2|" + r3 + "|0", b ? b.sn : "") || touched;
+      touched = autoSet("p8#t2|" + r3 + "|1", b ? b.win : "") || touched;
+      touched = autoSet("p8#t2|" + r3 + "|2", b ? b.team : "") || touched;
+    }
+
+    /* ---------- Rosters : un manager par ligne, loyautés en contrats ---------- */
+    var loyal = {};
+    seasons.forEach(function(s){
+      s.stars.forEach(function(st){
+        if(!yes(st.c[3])) return;
+        var k = norm(st.c[0]);
+        if(!k || !st.c[1]) return;
+        if(!loyal[k]) loyal[k] = [];
+        if(loyal[k].indexOf(st.c[1]) < 0) loyal[k].push(st.c[1]);
+      });
+    });
+    function divOf(name){
+      var k = norm(name), d = "";
+      seasons.forEach(function(s){
+        s.stars.forEach(function(st){ if(norm(st.c[0]) === k && st.c[2]) d = st.c[2]; });
+      });
+      return d;
+    }
+    touched = wantRows("p6#t0", L.list.length, 5) || touched;
+    for(var r4 = 0; r4 < Math.max(5, L.list.length); r4++){
+      var m4 = L.list[r4];
+      var ct = m4 ? (loyal[norm(m4.name)] || []) : [];
+      touched = autoSet("p6#t0|" + r4 + "|0", m4 ? m4.name : "") || touched;
+      touched = autoSet("p6#t0|" + r4 + "|1", m4 ? m4.team : "") || touched;
+      touched = autoSet("p6#t0|" + r4 + "|2", m4 ? divOf(m4.name) : "") || touched;
+      for(var ci = 0; ci < 3; ci++){
+        touched = autoSet("p6#t0|" + r4 + "|" + (3 + ci), ct[ci] || "") || touched;
+      }
+    }
+
+    /* ---------- Rosters : registre des équipes déjà jouées ---------- */
+    var used = [], seenUsed = {};
+    seasons.forEach(function(s){
+      s.res.forEach(function(r){
+        if(!r.c[1]) return;
+        var k = norm(r.c[1]) + "|" + cycleOf(s.n);
+        if(seenUsed[k]) return;
+        seenUsed[k] = 1;
+        used.push({team:r.c[1], cy:cycleOf(s.n), man:r.c[0]});
+      });
+    });
+    touched = wantRows("p6#t1", used.length, 5) || touched;
+    for(var r5 = 0; r5 < Math.max(5, used.length); r5++){
+      var u = used[r5];
+      touched = autoSet("p6#t1|" + r5 + "|0", u ? u.team : "") || touched;
+      touched = autoSet("p6#t1|" + r5 + "|1", u ? u.cy : "") || touched;
+      touched = autoSet("p6#t1|" + r5 + "|2", u ? u.man : "") || touched;
+    }
+
+    /* ---------- Spike! : numéro de saison des chroniques ---------- */
+    var played = seasons.filter(function(x){ return x.res.length; });
+    for(var r6 = 0; r6 < Math.max(4, played.length); r6++){
+      touched = autoSet("p9#t0|" + r6 + "|0", played[r6] ? "S" + played[r6].n : "") || touched;
+    }
+
+    return touched;
+  }
+
+  /* liseré vert sur ce qui vient d'une feuille de saison */
+  function markAuto(panel){
+    panel.querySelectorAll("[data-key]").forEach(function(el){
+      el.classList.toggle("af", !!AUTO_KEYS[el.dataset.key]);
+    });
+  }
+
+  /* le marché : recrues sans logo, non encore draftées */
+  function marketHTML(){
+    var seasons = seasonData(), rows = [];
+    seasons.forEach(function(s){
+      s.stars.forEach(function(st){
+        if(!st.c[1]) return;
+        if(yes(st.c[3])) return;
+        var pending = String(st.c[3] || "").trim() === "";
+        rows.push(["S" + s.n, st.c[1], st.c[2] || "—", st.c[0], pending ? "logo à préciser" : "au marché"]);
+      });
+    });
+    if(!rows.length) return '<p class="dg-empty">Marché vide. Aucune recrue hors logo relevée sur les feuilles de saison.</p>';
+    return '<div class="auto"><span class="lab">Relevé · ' + rows.length + ' star(s) au marché</span>'
+      + tableHTML(["S", "Star Player", "Sous-division", "Versée par", "Statut"], rows)
+      + "<p>Une star draftée se reporte à la main dans une case Contrat libre du tableau des rosters.</p></div>";
+  }
+
+  var filling = false, DIRTY_POINTS = false;
+  function renderAll(){
+    if(filling) return;
+    filling = true;
+    try{
+      var moved = recomputePoints();
+      if(moved) DIRTY_POINTS = true;
+      moved = autofill() || moved;
+      if(DIRTY_POINTS){ DIRTY.p5 = 1; DIRTY_POINTS = false; }
+      if(moved){
+        panels.forEach(function(p){ if(DIRTY[p.id]) hydratePanel(p); });
+        queueSave();
+      }
+      panels.forEach(markAuto);
+      renderDigest();
+      renderAuto();
+    } finally { filling = false; }
+  }
+
 
   function renderDigest(){
     /* la manchette : dernière chronique saisie */
@@ -2651,7 +2698,7 @@
   var EMBLEMS = {
     p0:"i-skullball",
     p1:"i-skullball", p2:"i-whistle", p3:"i-pitch",  p4:"i-trophy", p5:"i-boot",
-    p6:"i-helmet",    p7:"i-coin",    p8:"i-star",   p9:"i-skullball", p10:"i-tomb",   p11:"i-star"
+    p6:"i-helmet",    p8:"i-star",   p9:"i-skullball"
   };
 
   function decorate(){
@@ -2678,11 +2725,27 @@
   }
 
   /* ---------- démarrage ---------- */
+  /* Les onglets En suspens et Legendary Ed. ont disparu : leurs zones de
+     saisie sont reversees dans les Notes libres de Reglages. */
+  function migrateNotes(){
+    var to = "p1|notes-libres", moved = false;
+    ["p10|notes-libres", "p11|le-notes"].forEach(function(from){
+      if(state[from] === undefined) return;
+      var txt = String(state[from]).trim();
+      if(txt){
+        if(!state[to] || !String(state[to]).trim()) state[to] = txt;
+        else if(String(state[to]).indexOf(txt) < 0) state[to] = state[to] + "\n" + txt;
+      }
+      delete state[from];
+      moved = true;
+    });
+    return moved;
+  }
+
   function boot(){
     decorate();
     addRowButtons();
-    var cl = document.getElementById("copyLedger");
-    if(cl) cl.addEventListener("click", copyLedger);
+    if(migrateNotes()) queueSave();
     panels.forEach(hydratePanel);
     renderAll();
     /* sur écran étroit, la barre d'onglets défile : amener l'onglet actif en vue */
